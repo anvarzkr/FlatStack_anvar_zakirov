@@ -1,0 +1,10 @@
+.comment data-id=comment.id
+  .comment-nickname
+    = comment.nickname
+
+  .comment-text
+    = comment.text
+
+  = link_to "Удалить", comment, method: :delete, remote: true
+  br
+  br

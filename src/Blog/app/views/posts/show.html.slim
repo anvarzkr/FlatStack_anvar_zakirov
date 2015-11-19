@@ -1,0 +1,50 @@
+.row
+  .medium-12.columns
+
+    p#notice = notice
+
+    p
+      strong
+        | Title:
+      = @post.title
+
+    p
+      strong
+        | Body:
+      = @post.body
+
+    .comments
+      - @comments.each do |comment|
+        = render comment
+
+
+    = form_for(@post.comments.new, remote: true) do |f|
+      / - if @comment.errors.any?
+      /   #error_explanation
+      /     h2
+      /       = pluralize(@comment.errors.count, "error")
+      /       | prohibited this comment from being saved:
+
+      /     ul
+      /     - @comment.errors.full_messages.each do |message|
+      /       li
+      /         = message
+
+      = f.hidden_field :post_id, :value => @post.id
+
+      .field
+        = f.label :text
+        br
+        = f.text_area :text
+
+      .field
+        = f.label :nickname
+        br
+        = f.text_field :nickname
+
+      .actions
+        = f.submit "Comment", class: "button"
+
+    = link_to 'Edit', edit_post_path(@post)
+    br
+    = link_to 'Back', posts_path
