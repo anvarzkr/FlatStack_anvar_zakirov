@@ -1,0 +1,15 @@
+- model_class = Post
+.posts
+  - @posts.each do |post|
+    .post
+      h1.post-title
+        = link_to post.title, post_path(post)
+      .post-image
+        = image_tag post.image.url(:medium)
+      .post-body
+        - body = post.body.split(/\s+/, 46)[0...45].join(' ')
+        = body
+        -if body.length < post.body.length
+          | ...
+
+      hr.colorgraph

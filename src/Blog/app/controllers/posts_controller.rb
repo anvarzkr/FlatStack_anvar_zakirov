@@ -1,12 +1,17 @@
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :edit, :update, :destroy]
-  before_action :authenticate_user!
+  # before_action :authenticate_user!, only: [:edit, :update, :destroy, :create, :new, :index]
+  before_action :authenticate_user!, except: [:feed, :show]
 
   # GET /posts
   # GET /posts.json
   def index
     # @posts = Post.order(created_at: :asc)
     @posts = current_user.posts.order(created_at: :asc)
+  end
+
+  def feed
+    @posts = Post.all.order(created_at: :asc)
   end
 
   # GET /posts/1
@@ -45,6 +50,10 @@ class PostsController < ApplicationController
   # PATCH/PUT /posts/1
   # PATCH/PUT /posts/1.json
   def update
+    if post_params[:user_id] != current_user.id
+      post_params[:user_id] = current_user.id
+    end
+
     respond_to do |format|
       if @post.update(post_params)
         format.html { redirect_to @post, notice: 'Post was successfully updated.' }
@@ -59,6 +68,11 @@ class PostsController < ApplicationController
   # DELETE /posts/1
   # DELETE /posts/1.json
   def destroy
+
+    if current_user.id != @post.user_id
+      return;
+    end
+
     @post.destroy
     respond_to do |format|
       format.html { redirect_to posts_url, notice: 'Post was successfully destroyed.' }
@@ -74,6 +88,6 @@ class PostsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def post_params
-      params.require(:post).permit(:title, :body, :user_id)
+      params.require(:post).permit(:title, :body, :user_id, :image)
     end
 end

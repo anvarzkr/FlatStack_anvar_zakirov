@@ -1,50 +1,54 @@
-.row
-  .medium-12.columns
+- model_class = Post
+/ .page-header
+/   h1=t '.title', :default => model_class.model_name.human.titleize
 
-    p#notice = notice
+/ p
+/   strong= model_class.human_attribute_name(:title) + ':'
+/   br
+/   = @post.title
+/ p
+/   strong= model_class.human_attribute_name(:body) + ':'
+/   br
+/   = @post.body
+/ p
+/   strong= model_class.human_attribute_name(:user_id) + ':'
+/   br
+/   = @post.user_id
 
-    p
-      strong
-        | Title:
-      = @post.title
+.post
+  h1.post-title
+    = link_to @post.title, post_path(@post)
+  .post-image
+    = image_tag @post.image.url(:medium)
+  .post-body
+    = @post.body
+  hr.colorgraph
 
-    p
-      strong
-        | Body:
-      = @post.body
+h3
+  | Comments:
 
-    .comments
-      - @comments.each do |comment|
-        = render comment
+.comments.container-fluid
+  - @comments.each do |comment|
+    = render comment
 
+br
 
-    = form_for(@post.comments.new, remote: true) do |f|
-      / - if @comment.errors.any?
-      /   #error_explanation
-      /     h2
-      /       = pluralize(@comment.errors.count, "error")
-      /       | prohibited this comment from being saved:
+= form_for(@post.comments.new, remote: true) do |f|
 
-      /     ul
-      /     - @comment.errors.full_messages.each do |message|
-      /       li
-      /         = message
+  = f.hidden_field :post_id, :value => @post.id
+  = f.hidden_field :user_id, :value => current_user.id
 
-      = f.hidden_field :post_id, :value => @post.id
+  .form-group
+    = f.text_area :text, class: "form-control", style: "resize: vertical", placeholder: "Comment body here.."
 
-      .field
-        = f.label :text
-        br
-        = f.text_area :text
+  .actions
+    = f.submit "Comment", class: "btn btn-success"
 
-      .field
-        = f.label :nickname
-        br
-        = f.text_field :nickname
+br
+= link_to t('.back', :default => t("helpers.links.back")), feed_path, :class => 'btn btn-default'
 
-      .actions
-        = f.submit "Comment", class: "button"
-
-    = link_to 'Edit', edit_post_path(@post)
-    br
-    = link_to 'Back', posts_path
+- if current_user.id == @post.user_id
+  '
+  = link_to t('.edit', :default => t("helpers.links.edit")), edit_post_path(@post), :class => 'btn btn-default'
+  '
+  = link_to t('.destroy', :default => t("helpers.links.destroy")), post_path(@post), :method => "delete", :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-danger'
